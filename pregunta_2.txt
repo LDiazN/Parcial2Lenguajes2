@@ -1,0 +1,78 @@
+s, i = 0, 0
+while (i < 10) do
+    s = s + (i * i)/2
+    i = i + 1
+
+2.1:
+Máquina de pila:
+
+push 0
+lvalue s
+assign
+push 0 
+lvalue i
+assign
+
+start:
+    rvalue i 
+    push
+    isLt        # if is less than
+
+    gofalse end # go to end tag if top is false
+
+    rvalue i
+    rvalue i
+    mul             # i * i
+
+    push 2
+    div             # (i * i) / 2
+
+
+    rvalue s
+    sum             # ((i*i) / 2) + s
+
+    lvalue s
+    assign          # s = (((i*i) / 2) + s)
+
+    rvalue i
+    push 1
+    sum             # i + 1
+
+    lvalue i 
+    assign          # i = (i+1)
+
+    go start           # go to t0 tag
+
+end:
+
+
+
+2.2:
+
+i := 0
+s := 0
+
+start:
+    # check if i < 10, if not, then go to end tag
+    r0 := i < 10
+    r0 := !r0
+
+    if r0 goto start
+
+    # Update s
+    r0 := i * i
+    r0 := r0 / 2
+    r0 := s + r0
+    s := r0
+
+    # update i 
+    r0 := i + 1
+    i := r0
+
+    # go back to start
+    goto start
+
+end:
+
+
+

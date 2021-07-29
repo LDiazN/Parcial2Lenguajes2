@@ -1,0 +1,80 @@
+3.a) 
+    E   → E + E
+        | E ∧ E
+        | E < E
+        | E ?: E
+        | E !!
+        | (E)
+        | num
+        | true
+        | false
+        | null
+
+Creamos el esquema de traducción dirigido por sintaxis 
+
+E   → E1 + E2           { E.type <- if E1.type == E2.type and E1.type == INT 
+                                        then INT 
+                                        else TYPE_ERROR 
+                        }
+    | E1 ∧ E2           { E.type <- if E1.type == E2.type and E1.type == BOOL 
+                                        then BOOL 
+                                        else TYPE_ERROR 
+                        }
+    | E1 < E2           { E.type <- if E1.type == E2.type and E1.type == INT 
+                                        then BOOL 
+                                        else TYPE_ERROR 
+                        }
+    | E1 ?: E2          { E.type <- if E1.type == TYPE_ERROR || E2.type == TYPE_ERROR
+                                        then TYPE_ERROR
+                                        else if E1 == NULL 
+                                            then E2.type
+                                            else E1.type 
+                        }
+    | E1 !!             { E.type <- if E1.type == NULL  
+                                        then E1.type
+                                        else TYPE_ERROR 
+                        }
+    | (E)               { E.type <- E1.type }
+    | num               { E.type <- INT }
+    | true              { E.type <- BOOL }
+    | false             { E.type <- BOOL }
+    | null              { E.type <- NULL }
+
+3.c) 
+
+    Aumentamos la gramática	con la siguiente regla:
+    S → repeatWhen E lt S gt S
+
+    Con las acciones apropiadas:
+
+    S → repeatWhen E lt S1 gt S2    {
+                                        S.type <- if E.type != INT || S1.type != VOID || S2.type != VOID 
+                                                    then TYPE_ERROR
+                                                    else VOID
+                                    }
+
+3.d) Ahora expresamos todo en términos de reglas de inferencia
+
+p |- E1 : INT E2 : INT
+=======================
+p |- E1 + E2: INT
+
+p |- E1 : BOOL E2 : BOOL
+=======================
+p |- E1 ∧ E2: BOOL
+
+p |- E1 : INT E2 : INT
+=======================
+p |- E1 < E2: BOOL
+
+p |- E1 : NULL E2 : T       p |- E1 : T1 E2 : T2
+=======================  O  =======================
+p |- E1 :? E2: T            p |- E1 :? E2: T1 
+
+p |- E1 : T
+======================= con T en { BOOL, INT }
+p |- E1 !! : T
+
+p |- E : INT S1 : VOID S2 : VOID
+=======================
+p |- repeatWhen E lt S1 gt S2 : VOID
